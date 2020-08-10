@@ -1,0 +1,61 @@
+﻿<Window x:Class="PlateDroplet.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:numeric="http://gu.se/NumericInput"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:PlateDroplet.UI.Controls"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        mc:Ignorable="d"
+        MinHeight="690" MaxHeight="690"
+        MinWidth="690" MaxWidth="690"
+        Title="Plate Droplet Data Display">
+
+    <Border Padding="10">
+        <Grid controls:GridEx.RowHeights="auto,*,auto">
+
+            <Grid controls:GridEx.RowHeights="auto,auto" Margin="0,0,0,10">
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Droplet Threshold" Style="{StaticResource Label-Style}" />
+                    <Label Content="Rule Group" Style="{StaticResource Label-Style}" Margin="70,5,0,5" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <numeric:IntBox Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                                    ValidationTrigger="LostFocus" MaxLength="3" 
+                                    HorizontalContentAlignment="Left" MinValue="0" MaxValue="500" Width="200"/>
+
+                    <numeric:IntBox Value="{Binding RuleGroup, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                                    ValidationTrigger="LostFocus" Margin="10,0,10,0"
+                                    HorizontalContentAlignment="Left" MinValue="1" Width="200" MaxLength="3" />
+
+                    <Button Content="Update" Command="{Binding UpdateCommand}" Style="{StaticResource Button-Style}" />
+                </StackPanel>
+
+            </Grid>
+
+            <controls:DropletPanel Grid.Row="1" Result="{Binding Result}" />
+
+            <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,10,0,0">
+                <Label Content="Summary" Style="{StaticResource Label-Style}" />
+                <TextBlock Margin="0" Style="{DynamicResource TextBlock-Style}">
+                    <Run Text="Total Number of Groups: " />
+                    <Run Text="{Binding TotalNumber}" />
+                </TextBlock>
+                <TextBlock Margin="0" Style="{DynamicResource TextBlock-Style}">
+                    <Run Text="Number of wells in largest group: " />
+                    <Run Text="{Binding NumberInLargestGroup}" />
+                </TextBlock>
+                <TextBlock Margin="0" Style="{DynamicResource TextBlock-Style}">
+                    <Run Text="Number of wells in smallest group: " />
+                    <Run Text="{Binding NumberInSmallestGroup}" />
+                </TextBlock>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+
+
+</Window>
