@@ -131,7 +131,7 @@ namespace PlateDroplet.UI.Controls
             {
                 Content = $"Index: {well.Index} \n" +
                           $"DropletCount: {well.DropletCount} \n" +
-                          $"Group: {well.Group}",
+                          $"Group: {well.GetGroup()}",
             };
 
             return BuildItem(GetColor(well.Color), tooltip, well.Legend);
