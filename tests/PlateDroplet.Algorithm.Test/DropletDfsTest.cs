@@ -42,7 +42,7 @@ namespace PlateDroplet.Algorithm.Test
             var array = arrayDataConverter.Map(wells);
 
             var result = _dropletDfs.DeepSearch(array, thresold, ruleGroup);
-            result.TotalNumberOfGroups.ShouldBe(6);
+            result.TotalNumberOfGroups.ShouldBe(5);
         }
 
         [Theory]
@@ -68,7 +68,7 @@ namespace PlateDroplet.Algorithm.Test
             var array = arrayDataConverter.Map(wells);
 
             var result = _dropletDfs.DeepSearch(array, thresold, ruleGroup);
-            result.NumberOfWellsInSmallestGroup.ShouldBe(1);
+            result.NumberOfWellsInSmallestGroup.ShouldBe(2);
         }
 
         [Theory]
@@ -78,8 +78,6 @@ namespace PlateDroplet.Algorithm.Test
             var result = _dropletDfs.DeepSearch(data, threshold, 5);
            
             result.TotalNumberOfGroups.ShouldBe(1);
-            result.NumberWellsInLargestGroup.ShouldBe(1);
-            result.NumberOfWellsInSmallestGroup.ShouldBe(1);
         }
 
         [Theory]
@@ -89,8 +87,6 @@ namespace PlateDroplet.Algorithm.Test
             var result = _dropletDfs.DeepSearch(data, threshold, 5);
            
             result.TotalNumberOfGroups.ShouldBe(3);
-            result.NumberWellsInLargestGroup.ShouldBe(1);
-            result.NumberOfWellsInSmallestGroup.ShouldBe(1);
         }
 
         [Theory]
@@ -120,9 +116,9 @@ namespace PlateDroplet.Algorithm.Test
             var result = _dropletDfs.DeepSearch(data, threshold, ruleGroup);
             var elements = result.FindNodesWithColor(EColor.Red);
 
-            result.TotalNumberOfGroups.ShouldBe(3);
+            result.TotalNumberOfGroups.ShouldBe(2);
             result.NumberWellsInLargestGroup.ShouldBe(2);
-            result.NumberOfWellsInSmallestGroup.ShouldBe(1);
+            result.NumberOfWellsInSmallestGroup.ShouldBe(2);
             elements.Count().ShouldBe(4);
         }
 
