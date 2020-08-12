@@ -18,4 +18,10 @@
     <ProjectReference Include="..\PlateDroplet.Infrastructure\PlateDroplet.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

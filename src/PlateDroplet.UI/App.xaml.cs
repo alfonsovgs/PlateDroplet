@@ -16,24 +16,12 @@ namespace PlateDroplet.UI
     {
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IPlateDropletRepository, PlateDropletRepository>();
-            containerRegistry.RegisterSingleton<IArrayDataConverter, ArrayDataConverter>();
-            containerRegistry.RegisterSingleton<IDropletDfs, DropletDfs>();
+            containerRegistry.RegisterSingleton<IPlateDropletRepository, PlateDropletRepository>()
+                .RegisterSingleton<IArrayDataConverter, ArrayDataConverter>()
+                .RegisterSingleton<IDropletDfs, DropletDfs>()
+                .RegisterInstance<IPlateDropletConfiguration>(new PlateConfiguration(rows: 8, cols: 12));
 
-            //Default configuration
-            var plateDropletConfig = new PlateDropletConfiguration(cfg =>
-            {
-                cfg.Rows = 8;
-                cfg.Cols = 12;
-            });
-
-            var plateConfiguration = plateDropletConfig.CreateConfiguration();
-            containerRegistry.RegisterInstance(plateConfiguration);
-
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<PlateDropletMapperProfiler>();
-            });
+            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<PlateDropletMapperProfiler>());
 
             var mapper = mapperConfig.CreateMapper();
             containerRegistry.RegisterInstance(mapper);
