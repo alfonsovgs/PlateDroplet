@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PlateDroplet.Algorithm.Utilities;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PlateDroplet.Algorithm.Models
@@ -13,17 +14,18 @@ namespace PlateDroplet.Algorithm.Models
 
         public PlateDropletResult(WellNode[,] wellNodes, IReadOnlyCollection<WellsGroup> wellsGroup)
         {
-            TotalNumberOfGroups = wellsGroup.Count;
             WeelsNode = MappNodes(wellNodes, wellsGroup);
-
+            wellsGroup = wellsGroup.Where(IsEqualOrGreaterThanTwo).ToList();
+            
+            TotalNumberOfGroups = wellsGroup.Count;
             NumberWellsInLargestGroup = wellsGroup.Any() ? wellsGroup.Max(w => w.MaxNodes) : 0;
             NumberOfWellsInSmallestGroup = wellsGroup.Any() ? wellsGroup.Min(w => w.MaxNodes) : 0;
         }
 
         private WellNode[,] MappNodes(WellNode[,] wellNodes, IReadOnlyCollection<WellsGroup> wellsGroup)
         {
-            var rows = wellNodes.GetLength(0);
-            var cols = wellNodes.GetLength(1);
+            var rows = wellNodes.GetRows();
+            var cols = wellNodes.GetCols();
 
             for (var row = 0; row < rows; row++)
             {
@@ -42,10 +44,12 @@ namespace PlateDroplet.Algorithm.Models
             return wellNodes;
         }
 
+        private bool IsEqualOrGreaterThanTwo(WellsGroup wellsGroup) => wellsGroup.MaxNodes >= 2;
+
         public IEnumerable<WellNode> FindNodesWithColor(EColor color)
         {
-            var rows = WeelsNode.GetLength(0);
-            var cols = WeelsNode.GetLength(1);
+            var rows = WeelsNode.GetRows();
+            var cols = WeelsNode.GetCols();
 
             for (var row = 0; row < rows; row++)
             {

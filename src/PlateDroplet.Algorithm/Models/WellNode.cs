@@ -22,6 +22,8 @@
 
         public static WellNode FromData(int index, int dropletCount) => new WellNode(index, dropletCount);
 
+        public bool CanVisit() => Legend == "L";
+
         public void ApplyLegend(int threshold)
         {
             //The rule define:

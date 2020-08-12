@@ -1,4 +1,5 @@
 ﻿using PlateDroplet.Algorithm.Models;
+using PlateDroplet.Algorithm.Utilities;
 using System.Collections.Generic;
 
 namespace PlateDroplet.Algorithm
@@ -10,14 +11,14 @@ namespace PlateDroplet.Algorithm
 
         public PlateDropletResult DeepSearch(WellNode[,] wellNodes, int threshold, int ruleGroup)
         {
-            _rows = wellNodes.GetLength(0);
-            _cols = wellNodes.GetLength(1);
+            _rows = wellNodes.GetRows();
+            _cols = wellNodes.GetCols();
 
             //Apply legend in all nodes
             SetLegend(wellNodes, threshold);
 
             var wellsGroups = new List<WellsGroup>();
-            var wellGroup = 1;
+            var wellsGroupCounter = 0;
 
             for (var row = 0; row < _rows; ++row)
             {
@@ -26,9 +27,8 @@ namespace PlateDroplet.Algorithm
                     var nodeFound = FindLinkedWells(wellNodes, row, col);
                     if(nodeFound == null) continue;
 
-                    var wellsGroup = ProccessWellGroup(nodeFound, wellGroup, ruleGroup);
+                    var wellsGroup = ProccessWellGroup(nodeFound, ref wellsGroupCounter, ruleGroup);
                     wellsGroups.Add(wellsGroup);
-                    wellGroup++;
                 }
             }
 
@@ -36,7 +36,7 @@ namespace PlateDroplet.Algorithm
         }
 
         //TODO: Mapping in other class
-        private void SetLegend(WellNode[,] wellNodes,  int threshold)
+        private void SetLegend(WellNode[,] wellNodes, int threshold)
         {
             for (var row = 0; row < _rows; ++row)
             {
@@ -58,17 +58,17 @@ namespace PlateDroplet.Algorithm
             //wellNodes[row, col].Visited it means the wellNode has all relations
             //and  wellNodes[row, col].Legend != "L" to prevent only process or determinate
             //finalization of continuous recursion.
-            if (!IsValid(row, col) || wellNodes[row, col].Visited || wellNodes[row, col].Legend != "L")
+            if (!IsValid(row, col) || wellNodes[row, col].Visited || !wellNodes[row, col].CanVisit())
             {
                 return null;
             }
 
             var node = wellNodes[row, col];
 
-            //if wellNode was visited
+            //if wellNode is visited
             node.Visited = true;
 
-            //In this case I implemented a aproach of DFS to find continuos elements in the well node
+            //In this case I implemented a approach of DFS to find continuos elements in the well node
             //Based in the document's rules in each elements is searched
             //its nodes in the left, top, right and down
             node.Left = FindLinkedWells(wellNodes, row, col - 1);
@@ -79,16 +79,25 @@ namespace PlateDroplet.Algorithm
         }
 
         /// <summary>
-        /// Process WellNode and get and WellsGroup to representated the group and
+        /// Process WellNode and get and WellsGroup to represent the group and
         /// how many elements contains the group.
         /// </summary>
-        private WellsGroup ProccessWellGroup(WellNode mainNode, int groupGroup, int ruleGroup)
+        private WellsGroup ProccessWellGroup(WellNode mainNode, ref int wellsGroupCounter, int ruleGroup)
         {
-            var wellGroup = WellsGroup.FromGroup(groupGroup);
+            WellsGroup wellGroup;
+            var nodesIndexInTree = new List<int>();
             var maxNodes = FindNodes(mainNode);
 
-            wellGroup.AddMaxNodes(maxNodes);
-            wellGroup.Evaluate(ruleGroup);
+            if (maxNodes >= 2)
+            {
+                wellsGroupCounter++;
+                wellGroup = WellsGroup.NewWellsGroup(wellsGroupCounter, nodesIndexInTree);
+            }
+            else
+            {
+                wellGroup = WellsGroup.NewWellsGroup(-1, nodesIndexInTree);
+            }
+
             wellGroup.Evaluate(ruleGroup);
 
             //And recursion of tree aplying the DFS and count the max numbers of the Tree.
@@ -98,13 +107,13 @@ namespace PlateDroplet.Algorithm
             {
                 if (node == null) return 0;
                 
-                wellGroup.IndexNode.Add(node.Index);
+                nodesIndexInTree.Add(node.Index);
                 var right = FindNodes(node.Right);
                 var left = FindNodes(node.Left);
                 var top = FindNodes(node.Top);
                 var down = FindNodes(node.Down);
 
-                return (right + left + top + down) + 1;
+                return right + left + top + down + 1;
             }
 
             return wellGroup;
