@@ -6,6 +6,7 @@ using PlateDroplet.UI.Mapper;
 using Shouldly;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PlateDroplet.Algorithm.Utilities;
 using Xunit;
 
 namespace PlateDroplet.Algorithm.Test
@@ -38,8 +39,8 @@ namespace PlateDroplet.Algorithm.Test
             var arrayDataConverter = new ArrayDataConverter(_configuration.Object);
             var array = arrayDataConverter.Map(wells);
 
-            var row = array.GetLength(0);
-            var col = array.GetLength(1);
+            var row = array.GetRows();
+            var col = array.GetCols();
 
             row.ShouldBe(8);
             col.ShouldBe(12);
@@ -67,8 +68,8 @@ namespace PlateDroplet.Algorithm.Test
             var wells = mapper.Map<IEnumerable<IWell>>(data.Wells);
             var array = arrayDataConverter.Map(wells);
 
-            var newRows = array.GetLength(0);
-            var newCols = array.GetLength(1);
+            var newRows = array.GetRows();
+            var newCols = array.GetCols();
 
             newRows.ShouldBe(n);
             newCols.ShouldBe(m);
