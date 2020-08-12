@@ -8,6 +8,7 @@ using PlateDroplet.UI.Controls.Models;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace PlateDroplet.UI.ViewModels
@@ -50,14 +51,6 @@ namespace PlateDroplet.UI.ViewModels
             set => SetProperty(ref _dropletThreshold, value);
         }
 
-        private int? _ruleGroup = 5;
-
-        public int? RuleGroup
-        {
-            get => _ruleGroup;
-            set => SetProperty(ref _ruleGroup, value);
-        }
-
         private int _totalNumber;
 
         public int TotalNumber
@@ -82,7 +75,7 @@ namespace PlateDroplet.UI.ViewModels
             set => SetProperty(ref _numberInSmallestGroup, value);
         }
 
-        private bool HasValues => (DropletThreshold ?? 0) > 0 && (RuleGroup ?? 0) > 0;
+        private bool HasValues => (DropletThreshold ?? 0) > 0 && GetObjectiveGroup() > 0;
 
         private DelegateCommand _updateCommand;
 
@@ -101,7 +94,7 @@ namespace PlateDroplet.UI.ViewModels
             var weels = _mapper.Map<IEnumerable<IWell>>(_droplet.Wells);
 
             var data = _arrayDataConverter.Map(weels);
-            var result = _dropletDfs.DeepSearch(data, DropletThreshold.Value, RuleGroup.Value);
+            var result = _dropletDfs.DeepSearch(data, DropletThreshold.Value, GetObjectiveGroup());
 
             TotalNumber = result.TotalNumberOfGroups;
             NumberInLargestGroup = result.NumberWellsInLargestGroup;
@@ -109,6 +102,13 @@ namespace PlateDroplet.UI.ViewModels
 
             var wells = _mapper.Map<WellNodePanel[,]>(result.WeelsNode);
             Result = new WellNodePanelResult(wells);
+        }
+
+        private static int GetObjectiveGroup()
+        {
+            ConfigurationManager.RefreshSection("appSettings");
+            int.TryParse(ConfigurationManager.AppSettings["ObjectiveGroup"], out var objectiveGroup);
+            return objectiveGroup;
         }
     }
 }

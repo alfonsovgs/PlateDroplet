@@ -16,24 +16,15 @@
         <Grid controls:GridEx.RowHeights="auto,*,auto">
 
             <Grid controls:GridEx.RowHeights="auto,auto" Margin="0,0,0,10">
-
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Droplet Threshold" Style="{StaticResource Label-Style}" />
-                    <Label Content="Rule Group" Style="{StaticResource Label-Style}" Margin="70,5,0,5" />
-                </StackPanel>
+                <Label Content="Droplet Threshold" Style="{StaticResource Label-Style}" />
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                     <numeric:IntBox Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
                                     ValidationTrigger="LostFocus" MaxLength="3" 
                                     HorizontalContentAlignment="Left" MinValue="0" MaxValue="500" Width="200"/>
 
-                    <numeric:IntBox Value="{Binding RuleGroup, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
-                                    ValidationTrigger="LostFocus" Margin="10,0,10,0"
-                                    HorizontalContentAlignment="Left" MinValue="1" Width="200" MaxLength="3" />
-
                     <Button Content="Update" Command="{Binding UpdateCommand}" Style="{StaticResource Button-Style}" />
                 </StackPanel>
-
             </Grid>
 
             <controls:DropletPanel Grid.Row="1" Result="{Binding Result}" />
