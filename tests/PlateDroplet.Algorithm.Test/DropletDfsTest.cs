@@ -154,6 +154,19 @@ namespace PlateDroplet.Algorithm.Test
             result.WeelsNode[0,0].Top.ShouldBeNull();
         }
 
+        [Theory]
+        [ClassData(typeof(DropletZeroGroupButExistsGrayWell))]
+        public void Result_Hasnt_Groups_And_Exists_A_Well_Gray(WellNode[,] data, int threshold)
+        {
+            //To validate the rule in this case exist and well less than thresold
+            //But there is only one group.
+
+            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+
+            result.TotalNumberOfGroups.ShouldBe(0);
+            result.WeelsNode[0, 0].Color.ShouldBe(EColor.Gray);
+        }
+
         private IPlateDropletConfiguration GetConfiguration(int rows = 8, int cols = 12)
         {
             _configuration.Setup(m => m.Rows)
