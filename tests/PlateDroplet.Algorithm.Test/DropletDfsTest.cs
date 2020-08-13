@@ -14,34 +14,17 @@ namespace PlateDroplet.Algorithm.Test
 {
     public class DropletDfsTest
     {
-        private readonly IDropletDfs _dropletDfs;
-        private readonly IPlateDropletRepository _repository;
-        private readonly Mock<IPlateDropletConfiguration> _configuration;
-        private readonly IMapper _mapper;
-
-        public DropletDfsTest()
-        {
-            _dropletDfs = new DropletDfs();
-            _repository = new PlateDropletRepository();
-            _configuration = new Mock<IPlateDropletConfiguration>();
-
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<PlateDropletMapperProfiler>();
-            });
-            _mapper = new Mapper(config);
-        }
-
         [Theory]
         [InlineData(100, 5)]
         public async Task AddThreshold_RuleGruop_ReturnTotalNumerOfGroups_Equal_Six(int thresold, int ruleGroup)
         {
+            var dropletDfs = GetDropletDfs();
             var wells = await GetWells();
             
             var arrayDataConverter = new ArrayDataConverter(GetConfiguration());
             var array = arrayDataConverter.Map(wells);
 
-            var result = _dropletDfs.DeepSearch(array, thresold, ruleGroup);
+            var result = dropletDfs.DeepSearch(array, thresold, ruleGroup);
             result.TotalNumberOfGroups.ShouldBe(5);
         }
 
@@ -49,12 +32,13 @@ namespace PlateDroplet.Algorithm.Test
         [InlineData(100, 5)]
         public async Task AddThreshold_RuleGruop_ReturnNumberWellsInLargestGroup_Equal_Six(int thresold, int ruleGroup)
         {
+            var dropletDfs = GetDropletDfs();
             var wells = await GetWells();
             
             var arrayDataConverter = new ArrayDataConverter(GetConfiguration());
             var array = arrayDataConverter.Map(wells);
 
-            var result = _dropletDfs.DeepSearch(array, thresold, ruleGroup);
+            var result = dropletDfs.DeepSearch(array, thresold, ruleGroup);
             result.NumberWellsInLargestGroup.ShouldBe(6);
         }
 
@@ -62,38 +46,41 @@ namespace PlateDroplet.Algorithm.Test
         [InlineData(100, 5)]
         public async Task AddThreshold_RuleGruop_ReturnNumberOfWellsInSmallestGroup_Equal_One(int thresold, int ruleGroup)
         {
+            var dropletDfs = GetDropletDfs();
             var wells = await GetWells();
             
             var arrayDataConverter = new ArrayDataConverter(GetConfiguration());
             var array = arrayDataConverter.Map(wells);
 
-            var result = _dropletDfs.DeepSearch(array, thresold, ruleGroup);
+            var result = dropletDfs.DeepSearch(array, thresold, ruleGroup);
             result.NumberOfWellsInSmallestGroup.ShouldBe(2);
         }
 
         [Theory]
-        [ClassData(typeof(DropletOneGroupData))]
+        [ClassData(typeof(DropletOneGroupTheoryData))]
         public void PlateDropletResult_Returning_One_Group(WellNode[,] data, int threshold)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
-           
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
             result.TotalNumberOfGroups.ShouldBe(1);
         }
 
         [Theory]
-        [ClassData(typeof(DropletThreeGroupThresoldAndGroupIsOneData))]
+        [ClassData(typeof(DropletThreeGroupThresoldAndGroupIsOneTheoryData))]
         public void PlateDropletResult_Returning_Three_Groups(WellNode[,] data, int threshold)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
            
             result.TotalNumberOfGroups.ShouldBe(3);
         }
 
         [Theory]
-        [ClassData(typeof(DropletOneGroupData))]
+        [ClassData(typeof(DropletOneGroupTheoryData))]
         public void PlateDropletResult_Doesnt_Contains_Wells_In_Red(WellNode[,] data, int threshold)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
             var elements = result.FindNodesWithColor(EColor.Red);
 
             elements.Count().ShouldBe(0);
@@ -103,7 +90,8 @@ namespace PlateDroplet.Algorithm.Test
         [ClassData(typeof(PlateDropletWithThreeItemsInRedData))]
         public void PlateDropletResult_Has_Three_Wells_In_Red(WellNode[,] data, int threshold)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
             var elements = result.FindNodesWithColor(EColor.Red);
 
             elements.Count().ShouldBe(5);
@@ -113,7 +101,8 @@ namespace PlateDroplet.Algorithm.Test
         [ClassData(typeof(PlateDropletRuleGroupTwoWithThreeItemsInRed))]
         public void PlateDropletResult_Has_Four_Wells_In_Red_And_Three_Groups(WellNode[,] data, int threshold, int ruleGroup)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, ruleGroup);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, ruleGroup);
             var elements = result.FindNodesWithColor(EColor.Red);
 
             result.TotalNumberOfGroups.ShouldBe(2);
@@ -123,7 +112,7 @@ namespace PlateDroplet.Algorithm.Test
         }
 
         [Theory]
-        [ClassData(typeof(WellNodeWithoutLegendData))]
+        [ClassData(typeof(WellNodeWithoutLegendTheoryData))]
         public void WellNode_Doesnt_Have_Legend(WellNode[,] data, int threshold)
         {
             //The rule define:
@@ -136,17 +125,19 @@ namespace PlateDroplet.Algorithm.Test
             //In this case the thresold == 100 then the first wellNode 
             //doesn't have a legend.
 
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
 
             var firstNode = result.WeelsNode[0, 0];
             firstNode.Legend.ShouldBe(string.Empty);
         }
 
         [Theory]
-        [ClassData(typeof(WellNodeLinkedWithRightData))]
+        [ClassData(typeof(WellNodeLinkedWithRightTheoryData))]
         public void Get_WellNode_Without_Node_Related(WellNode[,] data, int threshold)
         {
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
 
             result.WeelsNode[0,0].Down.ShouldBeNull();
             result.WeelsNode[0,0].Left.ShouldBeNull();
@@ -155,13 +146,13 @@ namespace PlateDroplet.Algorithm.Test
         }
 
         [Theory]
-        [ClassData(typeof(DropletZeroGroupButExistsGrayWell))]
+        [ClassData(typeof(DropletZeroGroupButExistsGrayWellTheoryData))]
         public void Result_Hasnt_Groups_And_Exists_A_Well_Gray(WellNode[,] data, int threshold)
         {
-            //To validate the rule in this case exist and well less than thresold
+            //To validate the rule, in this case exist and well less than thresold
             //But there is only one group.
-
-            var result = _dropletDfs.DeepSearch(data, threshold, 5);
+            var dropletDfs = GetDropletDfs();
+            var result = dropletDfs.DeepSearch(data, threshold, 5);
 
             result.TotalNumberOfGroups.ShouldBe(0);
             result.WeelsNode[0, 0].Color.ShouldBe(EColor.Gray);
@@ -169,19 +160,34 @@ namespace PlateDroplet.Algorithm.Test
 
         private IPlateDropletConfiguration GetConfiguration(int rows = 8, int cols = 12)
         {
-            _configuration.Setup(m => m.Rows)
+            var configuration = new Mock<IPlateDropletConfiguration>();
+
+            configuration.Setup(m => m.Rows)
                 .Returns(rows);
 
-            _configuration.Setup(m => m.Cols)
+            configuration.Setup(m => m.Cols)
                 .Returns(cols);
 
-            return _configuration.Object;
+            return configuration.Object;
+        }
+
+        private IDropletDfs GetDropletDfs() => new DropletDfs();
+
+        private IPlateDropletRepository GetRepository() => new PlateDropletRepository();
+
+        private IMapper GetMapper()
+        {
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<PlateDropletMapperProfiler>());
+            return new Mapper(config);
         }
 
         private async Task<IEnumerable<IWell>> GetWells()
         {
-            var data = await _repository.GetDroplet();
-            return _mapper.Map<IEnumerable<IWell>>(data.Wells);
+            var repository = GetRepository();
+            var mapper = GetMapper();
+
+            var data = await repository.GetDroplet();
+            return mapper.Map<IEnumerable<IWell>>(data.Wells);
         }
     }
 }

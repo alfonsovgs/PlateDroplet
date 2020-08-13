@@ -1,42 +1,30 @@
 ﻿using AutoMapper;
 using Moq;
 using PlateDroplet.Algorithm.Models;
+using PlateDroplet.Algorithm.Utilities;
 using PlateDroplet.Infrastructure.Repositories;
 using PlateDroplet.UI.Mapper;
 using Shouldly;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PlateDroplet.Algorithm.Utilities;
 using Xunit;
 
 namespace PlateDroplet.Algorithm.Test
 {
     public class ArrayDataConverterTest
     {
-        private readonly Mock<IPlateDropletConfiguration> _configuration;
-
-        public ArrayDataConverterTest()
-        {
-            _configuration = new Mock<IPlateDropletConfiguration>();
-        }
-
         [Fact]
         public async Task Transform_IEnumerable_To_Array2D()
         {
+            var configuration = GetConfigurationMock(rows: 8, cols: 12);
             var repository = CreateRepository();
             var mapper = CreateMapper();
 
             var data = await repository.GetDroplet();
 
-            _configuration.Setup(m => m.Rows)
-                .Returns(8);
-
-            _configuration.Setup(m => m.Cols)
-                .Returns(12);
-
             var wells = mapper.Map<IEnumerable<IWell>>(data.Wells);
 
-            var arrayDataConverter = new ArrayDataConverter(_configuration.Object);
+            var arrayDataConverter = new ArrayDataConverter(configuration.Object);
             var array = arrayDataConverter.Map(wells);
 
             var row = array.GetRows();
@@ -52,18 +40,13 @@ namespace PlateDroplet.Algorithm.Test
         [InlineData(6,6)]
         public async Task Transform_IEnumerable_ToArray2D_N_M(int n, int m)
         {
+            var configuration = GetConfigurationMock(n, m);
             var repository = CreateRepository();
             var mapper = CreateMapper();
 
             var data = await repository.GetDroplet();
 
-            _configuration.Setup(c => c.Rows)
-                .Returns(n);
-
-            _configuration.Setup(c => c.Cols)
-                .Returns(m);
-
-            var arrayDataConverter = new ArrayDataConverter(_configuration.Object);
+            var arrayDataConverter = new ArrayDataConverter(configuration.Object);
 
             var wells = mapper.Map<IEnumerable<IWell>>(data.Wells);
             var array = arrayDataConverter.Map(wells);
@@ -73,6 +56,19 @@ namespace PlateDroplet.Algorithm.Test
 
             newRows.ShouldBe(n);
             newCols.ShouldBe(m);
+        }
+
+        private IMock<IPlateDropletConfiguration> GetConfigurationMock(int rows, int cols)
+        {
+            var configuration = new Mock<IPlateDropletConfiguration>();
+
+            configuration.Setup(m => m.Rows)
+                .Returns(rows);
+
+            configuration.Setup(m => m.Cols)
+                .Returns(cols);
+
+            return configuration;
         }
 
         public PlateDropletRepository CreateRepository() => new PlateDropletRepository();
