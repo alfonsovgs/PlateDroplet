@@ -92,13 +92,13 @@ namespace PlateDroplet.Algorithm
             {
                 wellsGroupCounter++;
                 wellGroup = WellsGroup.NewWellsGroup(wellsGroupCounter, nodesIndexInTree);
+                wellGroup.Evaluate(ruleGroup);
             }
             else
             {
                 wellGroup = WellsGroup.NewWellsGroup(-1, nodesIndexInTree);
             }
 
-            wellGroup.Evaluate(ruleGroup);
 
             //And recursion of tree aplying the DFS and count the max numbers of the Tree.
             //DFS application to get max elemnts in a Group in this case this wellNode may be a Tree.

@@ -3,7 +3,7 @@
     public enum EColor
     {
         Base,
-        Red,
         Gray,
+        Red,
     }
 }
