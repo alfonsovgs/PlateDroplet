@@ -45,6 +45,7 @@ namespace PlateDroplet.UI.Controls
 
         private void Draw()
         {
+            Children.Clear();
             DrawEmptySpace();
             DrawColumns();
             DrawRows();
