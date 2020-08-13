@@ -8,8 +8,9 @@
         xmlns:controls="clr-namespace:PlateDroplet.UI.Controls"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        MinHeight="690" MaxHeight="690"
-        MinWidth="690" MaxWidth="690"
+        MaxHeight="690"
+        MaxWidth="690"
+        ResizeMode="NoResize"
         Title="Plate Droplet Data Display">
 
     <Border Padding="10">
